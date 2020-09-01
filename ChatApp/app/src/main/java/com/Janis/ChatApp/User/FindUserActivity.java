@@ -1,4 +1,4 @@
-package com.example.myapplication;
+package com.Janis.ChatApp.User;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -9,8 +9,9 @@ import android.database.Cursor;
 import android.os.Bundle;
 import android.provider.ContactsContract;
 import android.telephony.TelephonyManager;
-import android.widget.LinearLayout;
 
+import com.example.myapplication.R;
+import com.Janis.ChatApp.Utilities.CountryToPhonePrefix;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -57,7 +58,7 @@ public class FindUserActivity extends AppCompatActivity {
             if(!String.valueOf(phone.charAt(0)).equals("+"))
                 phone = ISOPrefix + phone;
 
-            UserObject mContact = new UserObject(name, phone);
+            UserObject mContact = new UserObject("",name, phone);
             contactList.add(mContact);
 
             getUserDetails(mContact);
@@ -78,10 +79,19 @@ public class FindUserActivity extends AppCompatActivity {
                             phone = childSnapshot.child("phone").getValue().toString();
                         }
                         if(childSnapshot.child("name").getValue()!=null){
-                            phone = childSnapshot.child("name").getValue().toString();
+                            name = childSnapshot.child("name").getValue().toString();
                         }
 
-                        UserObject mUser = new UserObject(name, phone);
+                        UserObject mUser = new UserObject(childSnapshot.getKey(), name, phone);
+
+                        if(name.equals(phone)){
+                            for(UserObject mContactIterator : contactList){
+                                if(mContactIterator.getPhone().equals(mUser.getPhone())){
+                                    mUser.setName(mContactIterator.getName());
+                                }
+                            }
+                        }
+
                         userList.add(mUser);
                         mUserListAdapter.notifyDataSetChanged();
                         return;
